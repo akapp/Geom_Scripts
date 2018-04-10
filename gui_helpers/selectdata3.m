@@ -590,6 +590,7 @@ while selectionflag
      yselect = flipud(yselect);
      zselect = flipud(zselect);
      
+     autoselectsegment(xselect,yselect,zselect);
   end
       
   
@@ -829,7 +830,7 @@ function lassomotion(src,evnt) %#ok
   set(selecthandle,'xdata',xv,'ydata',yv,'zdata',zv)
   
   % did we enclose any new points?
-  [pointslist,xselect,yselect,zselect,nsel] = testpoly3(xv,yv,zv,xdata,ydata,zdata);
+  [pointslist,xselect,yselect,zselect,nsel] = testpoly(xv,yv,zv,xdata,ydata,zdata);
   
   % identify any points?
   if strcmp(params.Identify,'on')
@@ -899,10 +900,10 @@ function flagpoints
     hold on
     
     if ~iscell(xselect)
-      flaghandle = plot3(xselect,yselect,zselect,params.FlagMarker);
+      flaghandle = plot(xselect,yselect,params.FlagMarker);
       set(flaghandle,'Color',params.FlagColor,'MarkerFaceColor',params.FlagColor)
     else
-      flaghandle = plot3(vertcat(xselect{:}),vertcat(yselect{:}),vertcat(zselect{:}),params.FlagMarker);
+      flaghandle = plot(vertcat(xselect{:}),vertcat(yselect{:}),params.FlagMarker);
       set(flaghandle,'Color',params.FlagColor,'MarkerFaceColor',params.FlagColor)
     end
     
@@ -969,7 +970,7 @@ if ~iscell(xdata)
   
   % Which points from the data fall in the selection polygon?
   pl = find(inpolygon(xdata,ydata,xv,yv)); %xdata,ydata,zdata,xv,yv,zv))
-  % pl = find(inhull([xdata,ydata,zdata],[xv',yv',zv'])); % pl = find(inhull(testpts,xyz,tess,tol));
+  % pl = find(inhull(testpts,xyz,tess,tol));
   nsel = length(pl);
   
   xsel = xdata(pl);
@@ -982,61 +983,9 @@ else
   ysel = pl;
   zsel = pl;
   nsel = 0;
-  for i = 1:numel(xdata)
+  for i = 1:numel(xdata);
     pl{i} = find(inpolygon(xdata{i},ydata{i},xv,yv));
-    %pl{i,1} = find(inhull([xv',yv',zv'],[xdata{i},ydata{i},zdata{i}]));
-    nsel = nsel + length(pl{i});
-    
-    if ~isempty(pl{i})
-      xsel{i} = xdata{i}(pl{i});
-      ysel{i} = ydata{i}(pl{i});
-      zsel{i} = zdata{i}(pl{i});
-    end
-    
-  end
-end
-
-end % subfunction end
-
-function [pl,xsel,ysel,zsel,nsel] = testpoly3(xv,yv,zv,xdata,ydata,zdata)
-% checks which points are inside the given polygon
-
-if all(diff(xv)==0)
-    t1 = yv;    t2 = zv;
-    d1 = ydata; d2 = zdata;
-elseif all(diff(yv)==0)
-    t1 = xv;    t2 = zv;
-    d1 = xdata; d2 = zdata;
-elseif all(diff(zv)==0)
-    t1 = xv;    t2 = yv;
-    d1 = xdata; d2 = ydata;
-else
-    t1 = xv;    t2 = yv;
-    d1 = xdata; d2 = ydata;
-end
-
-% was there more than one set of points found in the plot?
-if ~iscell(d1)
-  % only one set, so xdata and ydata are not cell arrays
-  
-  % Which points from the data fall in the selection polygon?
-  pl = find(inpolygon(d1,d2,t1,t2)); %xdata,ydata,zdata,xv,yv,zv))
-  % pl = find(inhull([xdata,ydata,zdata],[xv',yv',zv'])); % pl = find(inhull(testpts,xyz,tess,tol));
-  nsel = length(pl);
-  
-  xsel = xdata(pl);
-  ysel = ydata(pl);
-  zsel = zdata(pl);
-else
-  % it was a cell array, so there were multiple sets.
-  pl = cell(size(xdata));
-  xsel = pl;
-  ysel = pl;
-  zsel = pl;
-  nsel = 0;
-  for i = 1:numel(d1)
-    pl{i} = find(inpolygon(d1{i},d2{i},t1,t2));
-    % pl{i,1} = find(inhull([xv',yv',zv'],[xdata{i},ydata{i},zdata{i}]));
+    % pl{i} = find(inhull([xdata{i},ydata{i},zdata{i}],[xv',yv',zv']));
     nsel = nsel + length(pl{i});
     
     if ~isempty(pl{i})

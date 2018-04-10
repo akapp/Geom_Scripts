@@ -1,4 +1,4 @@
-function [pointslist,xselect,yselect,zselect] = selectdata3(varargin)
+function [pointslist,xselect,yselect,zselect] = selectdata3_ed(varargin)
 % selectdata: graphical selection of data points on a plot using the mouse
 % usage: pointslist = selectdata         % uses all default options
 % usage: pointslist = selectdata(prop1,val1,prop2,val2,...)
@@ -239,6 +239,10 @@ function [pointslist,xselect,yselect,zselect] = selectdata3(varargin)
 % Release: 3.0
 % Release date: 2/19/07
 
+% Set defaults
+warning('off','MATLAB:gui:array:InvalidArrayShape')
+datacursormode on
+
 % defaults for the parameters
 params.Axes = gca;
 params.SelectionMode = 'lasso';
@@ -367,7 +371,7 @@ while selectionflag
       set(fighandle,'WindowButtonMotionFcn',@CPmotion);
       set(fighandle,'WindowButtonUpFcn',@selectdone);
       
-      % dx, dy to scale the distance
+      % dx, dy , dzto scale the distance
       dx = (axissize(2) - axissize(1));
       dy = (axissize(4) - axissize(3));
       dz = (axissize(4) - axissize(3));
@@ -461,6 +465,7 @@ while selectionflag
       % Selection lasso as a polygon
 
       % set the figure pointer
+      datacursormode off
       if ~isempty(params.Pointer)
         set(fighandle,'Pointer',params.Pointer)
       end
@@ -480,7 +485,13 @@ while selectionflag
       hold on
       if strcmp(params.Fill,'on')
         % filled
-        selecthandle = fill3(xv,yv,zv,params.FillColor);
+        XLim = get(params.Axes,'XLim');
+        YLim = get(params.Axes,'YLim');
+        ZLim = get(params.Axes,'ZLim');
+        selecthandle = fill3(params.Axes,xv,yv,zv,params.FillColor);
+        set(params.Axes,'XLim',XLim);
+        set(params.Axes,'YLim',YLim);
+        set(params.Axes,'ZLim',ZLim);
         set(selecthandle,'facealpha',params.FillTrans, ...
           'linestyle','--','edgecolor',params.FillEdgeColor)
       else
@@ -509,9 +520,8 @@ while selectionflag
 
       % ....
 
-      % resume.
-
-      % The lasso already is a polygon, stored in (xv,yv)
+      % resume.      
+      % The lasso already is a polygon, stored in (xv,yv,zv)
 
     case 'brush'
       % paint over the data, with a rectangular brush
@@ -584,13 +594,12 @@ while selectionflag
   end
   
   % check for flip
-  if params.Flip
+  if params.Flip && exist('pointslist','var')
      pointslist = flipud(pointslist);
      xselect = flipud(xselect);
      yselect = flipud(yselect);
      zselect = flipud(zselect);
      
-     autoselectsegment(xselect,yselect,zselect);
   end
       
   
@@ -900,10 +909,10 @@ function flagpoints
     hold on
     
     if ~iscell(xselect)
-      flaghandle = plot(xselect,yselect,params.FlagMarker);
+      flaghandle = plot3(xselect,yselect,zselect,params.FlagMarker);
       set(flaghandle,'Color',params.FlagColor,'MarkerFaceColor',params.FlagColor)
     else
-      flaghandle = plot(vertcat(xselect{:}),vertcat(yselect{:}),params.FlagMarker);
+      flaghandle = plot3(vertcat(xselect{:}),vertcat(yselect{:}),vertcat(zselect{:}),params.FlagMarker);
       set(flaghandle,'Color',params.FlagColor,'MarkerFaceColor',params.FlagColor)
     end
     
@@ -913,12 +922,12 @@ function flagpoints
     % otherwise, we just need to update xdata and ydata
     
     if nsel == 0
-      set(flaghandle,'xdata',[],'ydata',[]);
+      set(flaghandle,'xdata',[],'ydata',[], 'zdata', []);
       
     elseif ~iscell(xselect)
-      set(flaghandle,'xdata',xselect,'ydata',yselect);
+      set(flaghandle,'xdata',xselect,'ydata',yselect,'zdata',zselect);
     else
-      set(flaghandle,'xdata',vertcat(xselect{:}),'ydata',vertcat(yselect{:}));
+      set(flaghandle,'xdata',vertcat(xselect{:}),'ydata',vertcat(yselect{:}),'zdata',vertcat(zselect{:}));
     end
   end
 end
@@ -970,7 +979,7 @@ if ~iscell(xdata)
   
   % Which points from the data fall in the selection polygon?
   pl = find(inpolygon(xdata,ydata,xv,yv)); %xdata,ydata,zdata,xv,yv,zv))
-  % pl = find(inhull(testpts,xyz,tess,tol));
+  % pl = find(inhull([xdata,ydata,zdata],[xv',yv',zv'])); % pl = find(inhull(testpts,xyz,tess,tol));
   nsel = length(pl);
   
   xsel = xdata(pl);
@@ -983,9 +992,64 @@ else
   ysel = pl;
   zsel = pl;
   nsel = 0;
-  for i = 1:numel(xdata);
+  for i = 1:numel(xdata)
     pl{i} = find(inpolygon(xdata{i},ydata{i},xv,yv));
-    % pl{i} = find(inhull([xdata{i},ydata{i},zdata{i}],[xv',yv',zv']));
+    %pl{i,1} = find(inhull([xv',yv',zv'],[xdata{i},ydata{i},zdata{i}]));
+    nsel = nsel + length(pl{i});
+    
+    if ~isempty(pl{i})
+      xsel{i} = xdata{i}(pl{i});
+      ysel{i} = ydata{i}(pl{i});
+      zsel{i} = zdata{i}(pl{i});
+    end
+    
+  end
+end
+
+end % subfunction end
+
+% ================================================
+%                  subfunction
+% ================================================
+function [pl,xsel,ysel,zsel,nsel] = testpoly3(xv,yv,zv,xdata,ydata,zdata)
+% checks which points are inside the given polygon
+
+if all(diff(xv)==0)
+    t1 = yv;    t2 = zv;
+    d1 = ydata; d2 = zdata;
+elseif all(diff(yv)==0)
+    t1 = xv;    t2 = zv;
+    d1 = xdata; d2 = zdata;
+elseif all(diff(zv)==0)
+    t1 = xv;    t2 = yv;
+    d1 = xdata; d2 = ydata;
+else
+    t1 = xv;    t2 = yv;
+    d1 = xdata; d2 = ydata;
+end
+
+% was there more than one set of points found in the plot?
+if ~iscell(d1)
+  % only one set, so xdata and ydata are not cell arrays
+  
+  % Which points from the data fall in the selection polygon?
+  pl = find(inpolygon(d1,d2,t1,t2)); %xdata,ydata,zdata,xv,yv,zv))
+  % pl = find(inhull([xdata,ydata,zdata],[xv',yv',zv'])); % pl = find(inhull(testpts,xyz,tess,tol));
+  nsel = length(pl);
+  
+  xsel = xdata(pl);
+  ysel = ydata(pl);
+  zsel = zdata(pl);
+else
+  % it was a cell array, so there were multiple sets.
+  pl = cell(size(xdata));
+  xsel = pl;
+  ysel = pl;
+  zsel = pl;
+  nsel = 0;
+  for i = 1:numel(d1)
+    pl{i} = find(inpolygon(d1{i},d2{i},t1,t2));
+    % pl{i,1} = find(inhull([xv',yv',zv'],[xdata{i},ydata{i},zdata{i}]));
     nsel = nsel + length(pl{i});
     
     if ~isempty(pl{i})
@@ -1484,7 +1548,7 @@ blocks = max(1,floor(n/(memblock/nt)));
 aNr = repmat(aN,1,length(1:blocks:n));
 for i = 1:blocks
    j = i:blocks:n;
-   if size(aNr,2) ~= length(j),
+   if size(aNr,2) ~= length(j)
       aNr = repmat(aN,1,length(j));
    end
    in(j) = all((nrmls*testpts(j,:)' - aNr) >= -tol,1)';

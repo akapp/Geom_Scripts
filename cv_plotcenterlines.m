@@ -1,4 +1,4 @@
-function [figH,clineH] = cv_plotcenterlines(varargin)
+function [x,y,z,segs,figH,clineH] = cv_plotcenterlines(varargin)
 
 if isstruct(varargin{1})
     options=varargin{1};

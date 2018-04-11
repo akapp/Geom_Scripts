@@ -1,11 +1,12 @@
 function [segment] = cv_selectsegment(varargin)
 
 if isstruct(varargin{1})
-    data = varargin{1};
+    
     segs = cv_getsegs(data);
     x=cell([size(segs,1)-1,1]);
     y=cell([size(segs,1)-1,1]);
     z=cell([size(segs,1)-1,1]);
+    area=cell([size(segs,1)-1,1]);
     for i = 1:length(segs)-1
         x{i} = data.clines(segs(i)+1:segs(i+1),1);
         y{i} = data.clines(segs(i)+1:segs(i+1),2);
@@ -20,19 +21,6 @@ if isstruct(varargin{1})
     segname=varargin{7};
 
 elseif iscell(varargin{1})
-    
-    x=varargin{1};
-    y=varargin{2};
-    z=varargin{3};
-    
-    xs=varargin{4};
-    ys=varargin{5};
-    zs=varargin{6};
-    start_cursor=varargin{7};
-    end_cursor=varargin{8};
-    segname=varargin{9};
-    
-end
 
 % find line manually from pt flag
 if ~isempty(start_cursor) && ~isempty(end_cursor)

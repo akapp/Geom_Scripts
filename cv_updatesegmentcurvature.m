@@ -29,7 +29,7 @@ line = segment.line;
 if isfield(segment,'cleanidx')
     idx = segment.cleanidx;
 else
-    idx = segment.refidx;
+    idx = segment.refidx(1):segment.refidx(2);
 end
 
 segment.curvature = curvature{line}(idx);

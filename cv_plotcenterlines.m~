@@ -1,10 +1,8 @@
 function [x,y,z,segs,figH,clineH] = cv_plotcenterlines(varargin)
 
-if isfield(varargin{1},'ptdir')
+if isstruct(varargin{1})
     options=varargin{1};
     data = varargin{2};
-else
-    data = varargin{1};
 end
 
 figH = figure; 
@@ -31,8 +29,6 @@ end
 clineH=[clineH{:}]';
 axis equal
 c=reshape([clineH.Color]',[3,size(clineH,1)])'; %line colors
-setappdata(figH,'options',options)
-setappdata(figH,'data',data)
 setappdata(figH,'LineColors',c)
 setappdata(figH,'segs',segs)
 setappdata(figH,'xdata',x)
@@ -44,7 +40,6 @@ buttonwin = cv_buttonpanel(figH);
 set(buttonwin,'Position',[909   732   200   200])
 setappdata(figH,'buttonwin',buttonwin)
 
-
 function closesattelites(src,evnt)
 buttonwin = getappdata(src,'buttonwin');
 try
@@ -52,9 +47,9 @@ try
 end
 
 if isfield(getappdata(src),'selFig')
-    selFig = getappdata(src,'selFig');
+    selFig = getappdata(src,'buttonwin');
     try
-        close(selFig)
+        close(buttonwin)
     end
 end
 

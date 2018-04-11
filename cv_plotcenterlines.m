@@ -3,13 +3,17 @@ function [x,y,z,segs,figH,clineH] = cv_plotcenterlines(varargin)
 if isfield(varargin{1},'ptdir')
     options=varargin{1};
     data = varargin{2};
+    [~,ptname] = fileparts(options.ptdir);
+    figTitle = ['CenterlinesPlot: ',ptname];
 else
     data = varargin{1};
+    figTitle = 'CenterlinesPlot';
 end
 
 figH = figure; 
-set(figH,'Name','CenterlinesPlot',...
-    'Position',[135   228   773   628],...
+set(figH,'Name',figTitle, ...
+    'Position',[135   228   773   628], ...
+    'NumberTitle','off', ...
     'CloseRequestFcn', @closesattelites);
 
 hold all

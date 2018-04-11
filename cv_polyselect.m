@@ -30,11 +30,12 @@ chk = cv_checkxyzselect(x,y,z,pind,xs,ys,zs);
 
 % Plot selected
 idx=find(~cellfun(@isempty,x))';
-selFig = figure; hold on
-set(selFig,'Name','SelectedPoints',...
+selFig = figure(...
+    'Name','SelectedPoints',...
     'Position',[272   407   560   420],...
+    'NumberTitle','off',... 
     'CloseRequestFcn', @closesattelites);
-
+hold on
 c = getappdata(figH,'LineColors');
 for i=idx
     plot3(xs{i},ys{i},zs{i},'*','color',c(i,:));
@@ -45,7 +46,6 @@ axis equal
 buttonwin = cv_buttonpanel(selFig);
 set(buttonwin,'Position',[833   778   200   100])
 setappdata(selFig,'buttonwin',buttonwin)
-set(selFig,'Position',[272   407   560   420])
 setappdata(figH,'selFig',selFig)
 
 % Highlight in CenterlinesPlot

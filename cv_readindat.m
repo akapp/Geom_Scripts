@@ -10,6 +10,8 @@ elseif isstruct(varargin{1})
 else
     ptdir=varargin{1};
 end
+
+% Get vmtk Directory: [ptdir,'/vmtk'];
 [~,f] = fileparts(ptdir);
 if ~strcmp(f,'vmtk')
     directory = fullfile(ptdir,'vmtk');

@@ -1,21 +1,35 @@
 function [x,y,z,segs,figH,clineH] = cv_plotcenterlines(varargin)
 
+% [x,y,z,segs,figH,clineH] = cv_plotcenterlines(options,data)
+% [x,y,z,segs,figH,clineH] = cv_plotcenterlines(options,data,figH)
+
 if isfield(varargin{1},'ptdir')
     options=varargin{1};
     data = varargin{2};
     [~,ptname] = fileparts(options.ptdir);
-    figTitle = ['CenterlinesPlot: ',ptname];
+    figTitle = [options.prefs.cplot.Name,': ',ptname];
 else
+    options.prefs = cv_defaultprefs;
     data = varargin{1};
-    figTitle = 'CenterlinesPlot';
+    figTitle = options.prefs.cplot.Name;
+end
+if length(varargin)<=2
+    openNewFigure = 1;
+    figH = figure; 
+    set(figH,'Name',figTitle, ...
+        'Tag',options.prefs.cplot.Tag, ...
+        'Position',options.prefs.cplot.Position, ...
+        'NumberTitle','off', ...
+        'CloseRequestFcn', @closesattelites);
+    cameratoolbar('Show')
+else
+    % figH is cplot axis
+    openNewFigure = 0;
+    figH = varargin{3};
+    cla(figH)
 end
 
-figH = figure; 
-set(figH,'Name',figTitle, ...
-    'Position',[135   228   773   628], ...
-    'NumberTitle','off', ...
-    'CloseRequestFcn', @closesattelites);
-
+%%
 hold all
 segs = cv_getsegs(data);
 % nsegs = length(segs)-1;
@@ -43,11 +57,17 @@ setappdata(figH,'xdata',x)
 setappdata(figH,'ydata',y)
 setappdata(figH,'zdata',z)
 
-cameratoolbar('Show')
+%%
+if openNewFigure
 buttonwin = cv_buttonpanel(figH);
-set(buttonwin,'Position',[909   732   200   200])
+set(buttonwin, ...
+    'Name',options.prefs.cplot.bwinName, ...
+    'Position',options.prefs.cplot.bwinPosition)
 setappdata(figH,'buttonwin',buttonwin)
 
+else
+    
+end
 
 function closesattelites(src,evnt)
 buttonwin = getappdata(src,'buttonwin');
@@ -64,3 +84,5 @@ end
 
     delete(src)
 
+
+        

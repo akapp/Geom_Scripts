@@ -1,10 +1,14 @@
 function selFig = cv_polyselect(src,event,figH)
+% Plots selfig and selfig buttonwindow
+
 % key=0;
 % fprintf('Press any button to continue\r')
 % while key==0
 %     key = waitforbuttonpress;
 %     pause(0.2)
 % end
+options.prefs = cv_defaultprefs;
+
 set(0,'CurrentFigure',figH)
 if ~isequal([0 90],get(figH.CurrentAxes,'view'))
    warning('set axis to 0 90 for proper function of selectdata3') 
@@ -31,8 +35,9 @@ chk = cv_checkxyzselect(x,y,z,pind,xs,ys,zs);
 % Plot selected
 idx=find(~cellfun(@isempty,x))';
 selFig = figure(...
-    'Name','SelectedPoints',...
-    'Position',[272   407   560   420],...
+    'Name',options.prefs.selfig.Name,...
+    'Tag',options.prefs.selfig.Tag,...
+    'Position',options.prefs.selfig.Position,...
     'NumberTitle','off',... 
     'CloseRequestFcn', @closesattelites);
 hold on
@@ -44,7 +49,9 @@ cameratoolbar('Show')
 axis equal
 
 buttonwin = cv_buttonpanel(selFig);
-set(buttonwin,'Position',[833   778   200   100])
+set(buttonwin, ...
+    'Name',options.prefs.selfig.bwinName, ...
+    'Position',options.prefs.selfig.bwinPosition)
 setappdata(selFig,'buttonwin',buttonwin)
 setappdata(figH,'selFig',selFig)
 

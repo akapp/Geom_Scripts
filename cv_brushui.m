@@ -1,12 +1,18 @@
-function  [sel] = cv_brushui(figH)
+function  [sel,bH] = cv_brushui(figH)
 
 set(0,'CurrentFigure',figH)
 bH = brush(figH);
 set(bH,'enable','on','ActionPostCallback',@selection)
 uiwait
-set(bH,'enable','off');
-sel(:,1) = getappdata(figH,'Xselected');
-sel(:,2) = getappdata(figH,'Yselected');
+
+if isvalid(figH)
+    set(bH,'enable','off');
+    sel(:,1) = getappdata(figH,'Xselected');
+    sel(:,2) = getappdata(figH,'Yselected');
+else
+    sel = [];
+    return
+end
 
 function [xs,ys] = selection(src,event)
 child = get(event.Axes,'Children');

@@ -255,7 +255,6 @@ params.Pointer = 'cross';
 params.Return = 'selected';
 params.Verify = 'off';
 params.Label = 'off';
-params.Flip = 0;
 
 % Undocumented options, also unchecked for validity.
 % These parameters control the marker used to identify
@@ -264,6 +263,7 @@ params.Flip = 0;
 % must be a valid color spec. The default values are...
 params.FlagMarker = 'o';
 params.FlagColor = 'r';
+params.Flip = 0;
 
 % More (unchecked) options that are yours to fiddle with
 % (or not.) These control the fill color to be applied

@@ -1,4 +1,4 @@
-function [hstar,hline] = cv_plotselection(varargin)
+function [hstar,hline] = cv_plotpolyselection(varargin)
 
 xs = varargin{1};
 ys = varargin{2};

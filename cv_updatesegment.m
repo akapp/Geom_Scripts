@@ -1,4 +1,7 @@
-function segment = cv_updatesegment(data,segment)
+function [segment,isclean] = cv_updatesegment(data,segment)
+
+% Updates area curvature and torsion
+% Uses cleanidx when available
 
 segs = cv_getsegs(data);
 x=cell([size(segs,1)-1,1]);
@@ -23,10 +26,13 @@ for i = 1:length(segs)-1
     
 end
 
+% If cleaned use as index
 line = segment.line;
 if isfield(segment,'cleanidx')
+    isclean = 1;
     idx = segment.cleanidx;
 else
+    isclean = 0;
     idx = segment.refidx(1):segment.refidx(2);
 end
 

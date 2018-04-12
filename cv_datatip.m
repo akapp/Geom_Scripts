@@ -1,13 +1,22 @@
-function segment = cv_datatip(src,event,fighandle)
-% plot selection
-if strcmp(fighandle.Name,'CenterlinesPlot')% isfield(getappdata(fighandle),'pind')
-    x = getappdata(fighandle,'xdata');
-    y = getappdata(fighandle,'ydata');
-    z = getappdata(fighandle,'zdata');
-elseif strcmp(fighandle.Name,'SelectedPoints')% isfield(getappdata(fighandle),'pind')
-    x = getappdata(fighandle,'xselected');
-    y = getappdata(fighandle,'yselected');
-    z = getappdata(fighandle,'zselected');    
+function segment = cv_datatip(varargin)
+
+% % plot selection onto fighandle
+% if strcmp(fighandle.Name,'CenterlinesPlot')% isfield(getappdata(fighandle),'pind')
+%     x = getappdata(fighandle,'xdata');
+%     y = getappdata(fighandle,'ydata');
+%     z = getappdata(fighandle,'zdata');
+% elseif strcmp(fighandle.Name,'SelectedPoints')% isfield(getappdata(fighandle),'pind')
+%     x = getappdata(fighandle,'xselected');
+%     y = getappdata(fighandle,'yselected');
+%     z = getappdata(fighandle,'zselected');    
+% end
+
+if size(varargin,2)==1
+    handles = varargin{1};
+    fighandle = handles.guifig;
+    ingui = 1;
+elseif size(varargin,2)==3
+    fighandle = varargin{3};
 end
 
 dcm_obj = datacursormode(fighandle);
@@ -19,7 +28,8 @@ qA = questdlg('Would you like to identify a start point');
 if strcmp(qA,'Yes')
     set(0,'CurrentFigure',fighandle)
     qstate(1)=1;
-    cv_waitforspacebar
+    try cv_waitforspacebar(handles);
+    catch waitforspacebar(); end
     c1 = getCursorInfo(dcm_obj)
 elseif strcmp(qA,'Cancel')
     return
@@ -33,7 +43,8 @@ pause(0.4)
 qA = questdlg('Would you like to identify an End point');
 if strcmp(qA,'Yes')
     qstate(2)=1;
-    cv_waitforspacebar
+    try cv_waitforspacebar(handles);
+    catch waitforspacebar(); end
     c2 = getCursorInfo(dcm_obj)
 elseif strcmp(qA,'Cancel')
     return
@@ -67,34 +78,34 @@ elseif isequal(qstate,[0 1])
 elseif isequal(qstate,[0 0])
     error('No datapoins selected')
 end
+setappdata(fighandle,'segment',segment)
 
-% Highlight Segment
-l = segment.line;
-a = segment.refidx(1);
-b = segment.refidx(2);
-pause(0.2);
-hilightH = plot3(x{l}(a:b),y{l}(a:b),z{l}(a:b),'r-','linewidth',10);
-hilightH.Color(4)=0.4;
-cv_waitforspacebar
-delete(hilightH)
+% Highlight Segment and show 
+hilightS = cv_hilightsegment(fighandle,segment,0);
+setappdata(fighandle,'hilightSegment',hilightS)
+if ~ingui 
+    try cv_waitforspacebar(handles);
+    catch waitforspacebar(); end
+end
+
 
 % Name Segment
 iA = inputdlg('Enter segment name');
 if ~isempty(iA)
     segname = iA{1};
 else
+    setappdata(fighandle,'segment',segment)
+    setappdata(fighandle,'hilightSegment',hilightS);
     return
 end
 segment.name = segname;
-
 setappdata(fighandle,'segment',segment)
 
-qA = questdlg('Would you like to save the segment now?');
-if strcmp(qA,'Yes')
-   options = getappdata(fighandle,'options');
-   iA = inputdlg('Enter filename','Input Filename',1,{'seg_'});
-   [~,filename] = fileparts(iA{1});
-   save(fullfile(options.ptdir,[filename,'.mat']),'-struct','segment')
-elseif strcmp(qA,'Cancel')
-    return
+try
+    options = rmfield(getappdata(fighandle,'options'),'filename');
+    setappdata(fighandle,'options',options);
 end
+
+set(handles.fileslist,'Enable','off')
+
+% delete(hilightS)

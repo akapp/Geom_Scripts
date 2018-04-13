@@ -1,4 +1,4 @@
-function cv_writesegment2text(options,ask2name,multiple)
+function cv_writesegment2text(options,ask2name,ismultiple)
 
 % options.ptdir='/Users/arikappel/GoogleDrive/CRC_Lab/Geometry/Geom_Data/BB061';
 % options.ptname='BB061';
@@ -26,17 +26,20 @@ end
 % Option to input name for gui
 if nargin==1
     ask2name = false; % default name = cv_results.txt
-    multiple = false;
+    ismultiple = false;
 end
 
 %%
 for i = 1:length(options.filename)
     filename = options.filename{i};
     [segment,isclean] = cv_loadsegment([options.ptdir,filesep,filename]);
-    resfilename = checkinputs(options,segment,ask2name,multiple);
+    resfilename = checkinputs(options,segment,ask2name,ismultiple);
     
     % Check if Segment was previously written to file
     if exist([options.ptdir,'/',resfilename,'.txt'],'file')
+        if ismultiple
+            delete([options.ptdir,'/',resfilename,'.txt'])
+        else
         fid=fopen([options.ptdir,'/',resfilename,'.txt']);
         dataArray=textscan(fid,'%s%s%s','Delimiter',' ');
         fclose(fid);
@@ -70,6 +73,7 @@ for i = 1:length(options.filename)
             else
                 continue
             end
+        end
         end
     end
 

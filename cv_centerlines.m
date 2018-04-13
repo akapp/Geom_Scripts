@@ -22,7 +22,7 @@ function varargout = cv_centerlines(varargin)
 
 % Edit the above text to modify the response to help cv_centerlines
 
-% Last Modified by GUIDE v2.5 12-Apr-2018 15:06:29
+% Last Modified by GUIDE v2.5 12-Apr-2018 19:21:41
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -110,6 +110,8 @@ function choosepatdir_Callback(hObject, eventdata, handles)
 % hObject    handle to choosepatdir (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+% Reset handles
 setappdata(handles.guifig,'handles',handles)
 options.prefs=cv_defaultprefs;
 options.uipatdirs = cv_getpatients(options,handles);
@@ -140,18 +142,28 @@ function patdropdown_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns patdropdown contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from patdropdown
 cla(handles.cplot)
+set(handles.fileslist,'String',[])
+set(handles.fileslist,'Value',1)
 cv_busyaction(handles,'on','Loading...')
 pause(0.01);
 
 try 
-    handles.options = getappdata(handles.guifig,'options');
+    options = getappdata(handles.guifig,'options');
 catch
     return
 end
+try
+    options.ptdir = options.uipatdirs{handles.patdropdown.Value};
+catch
+    options.ptdir = options.uipatdirs{1};
+end
+        
+data = cv_readindat(options.ptdir);
+cv_plotcenterlines(options,data,handles.guifig);
 
-data = cv_readindat(handles.options.uipatdirs{handles.patdropdown.Value});
-cv_plotcenterlines(handles.options,data,handles.guifig);
-
+setappdata(handles.guifig,'data',data)
+setappdata(handles.guifig,'options',options)
+try delete(getappdata(handles.guifig,'hilightHandles')); end
 try rmappdata(handles.guifig,'hilightHandles'); end
 fileslist_Callback(hObject, eventdata, handles)
 
@@ -211,7 +223,7 @@ end
 
 % Check Size
 if ~isequal(size(hilightHandles,1),size(files,1)-1)
-    delete(hilightHandles{:});
+    try delete(hilightHandles{:}); end
     hilightHandles = cell(size(files,1)-1,1);
     setappdata(handles.guifig,'hilightHandles',hilightHandles)
 end
@@ -311,3 +323,19 @@ end
 options = getappdata(handles.guifig,'options');    
 cd(options.ptdir)
 system(['open ',options.ptdir])
+
+
+% --- Executes on button press in editselectionbutton.
+function editselectionbutton_Callback(hObject, eventdata, handles)
+% hObject    handle to editselectionbutton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+cv_editselection(handles)
+
+
+% --- Executes on button press in selectlinebutton.
+function selectlinebutton_Callback(hObject, eventdata, handles)
+% hObject    handle to selectlinebutton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+cv_selectline(handles)

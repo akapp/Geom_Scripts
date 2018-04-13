@@ -1,6 +1,21 @@
 function segment = cv_datatip(varargin)
 
-% % plot selection onto fighandle
+
+%% Parse Inputs
+if size(varargin,2)==1
+    handles = varargin{1};
+    fighandle = handles.guifig;
+    options = getappdata(fighandle,'options')
+    x = getappdata(fighandle,'xdata');
+    y = getappdata(fighandle,'ydata');
+    z = getappdata(fighandle,'zdata');
+    ingui = 1;
+elseif size(varargin,2)==3
+    fighandle = varargin{3};
+    options.prefs = cv_defaultprefs;
+end
+
+% % % plot selection onto fighandle
 % if strcmp(fighandle.Name,'CenterlinesPlot')% isfield(getappdata(fighandle),'pind')
 %     x = getappdata(fighandle,'xdata');
 %     y = getappdata(fighandle,'ydata');
@@ -10,15 +25,7 @@ function segment = cv_datatip(varargin)
 %     y = getappdata(fighandle,'yselected');
 %     z = getappdata(fighandle,'zselected');    
 % end
-
-if size(varargin,2)==1
-    handles = varargin{1};
-    fighandle = handles.guifig;
-    ingui = 1;
-elseif size(varargin,2)==3
-    fighandle = varargin{3};
-end
-
+%%
 dcm_obj = datacursormode(fighandle);
 set(dcm_obj,'DisplayStyle','datatip','Enable','on')
 
@@ -27,10 +34,15 @@ pause(0.4)
 qA = questdlg('Would you like to identify a start point');
 if strcmp(qA,'Yes')
     set(0,'CurrentFigure',fighandle)
-    qstate(1)=1;
-    try cv_waitforspacebar(handles);
-    catch waitforspacebar(); end
+    qstate(1)=1;   
+    try cv_waitforspacebar(handles); end
     c1 = getCursorInfo(dcm_obj)
+    % if options.prefs.segment.showcheckseglinewin
+    %     [~,spln,~,splr] = cv_processcursor(c1,x,y,z)
+    %     chkFig = cv_plotline(x,y,z,spln,splr);
+    %     try cv_waitforspacebar(handles); end
+    %     close(chkFig)
+    % end
 elseif strcmp(qA,'Cancel')
     return
 else

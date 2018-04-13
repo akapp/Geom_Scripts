@@ -19,8 +19,9 @@ prefs.hilight.Color = 'r';
 prefs.hilight.LineWidth = 12;
 
 %% Segment Options
+prefs.segment.showcheckseglinewin = 1; % default 0
 prefs.segment.asktosave = 0; % default 1
-options.prefs.segment.asktosave = 0; % default 1
+prefs.segment.asktoname = 0; % default 1
 
 %% parsedir
 prefs.parsedir.ext = '.mat';

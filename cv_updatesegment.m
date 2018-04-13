@@ -1,5 +1,6 @@
-function [segment,isclean] = cv_updatesegment(data,segment)
+function [segment,isclean,area] = cv_updatesegment(data,segment)
 
+% [segment,isclean] = cv_updatesegment(data,segment)
 % Updates area curvature and torsion
 % Uses cleanidx when available
 

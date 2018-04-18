@@ -23,6 +23,8 @@ prefs.segment.showcheckseglinewin = 1; % default 0
 prefs.segment.asktosave = 0; % default 1
 prefs.segment.asktoname = 0; % default 1
 
+prefs.sectionstoggle.PlotPopOut = 1; %default 0
+
 %% parsedir
 prefs.parsedir.ext = '.mat';
 

@@ -1,4 +1,4 @@
-function [options,segment,cleanFig] = cv_plotcleanarea(varargin)
+function [options,segment,cleanFig,A] = cv_plotcleanarea(varargin)
 
 % segment = cv_plotcleanarea(handles,'Flag','handles')
 % segment = cv_plotcleanarea(segment)
@@ -41,10 +41,19 @@ set(0,'CurrentFigure',cleanFig)
 
 [~,isclean,area] = cv_updatesegment(data,segment);
 l = segment.line;
-idx = segment.refidx(1):segment.refidx(2);
-plot(area{l}(idx))
+rIdx = segment.refidx(1):segment.refidx(2);
+plot(area{l}(rIdx))
 selection = cv_brushui(cleanFig);
-segment.cleanidx = selection(:,1);
+if isempty(selection)
+    fprintf('No data selected.\r')
+    close(cleanFig);
+    A = 'Cancel';
+    return
+else
+    A = 'Yes';
+end
+cIdx = selection(:,1);
+segment.cleanidx = rIdx(cIdx);
 segment = cv_updatesegment(data,segment);
 
 %     try delete(guifig,'hilightSegment'); end

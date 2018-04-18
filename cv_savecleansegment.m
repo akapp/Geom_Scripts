@@ -1,5 +1,10 @@
 function A = cv_savecleansegment(options,segment,cleanFig)
 
+% A = cv_savecleansegment(options,segment,cleanFig)
+
+if isfield(segment,'filename')
+    segment = rmfield(segment,'filename');
+end
 
 if isfield(options,'filename')
     [~,filename] = fileparts(options.filename{1});
@@ -16,8 +21,7 @@ end
 
 % Save
 if exist(fullfile(options.ptdir,[filename,'.mat']),'file')
-    A = questdlg('File already exists. Would you like to overwrite ',...
-        filename,' Now?');
+    A = questdlg('Would you like to save the the cleaned segment now?',filename);
     if strcmp(A,'Yes')
         save(fullfile(options.ptdir,[filename,'.mat']),'-struct','segment')
     else

@@ -7,8 +7,12 @@ uiwait
 
 if isvalid(figH)
     set(bH,'enable','off');
-    sel(:,1) = getappdata(figH,'Xselected');
-    sel(:,2) = getappdata(figH,'Yselected');
+    if ~isempty(getappdata(figH,'Xselected'))
+        sel(:,1) = getappdata(figH,'Xselected');
+        sel(:,2) = getappdata(figH,'Yselected');
+    else
+        sel = [];
+    end
 else
     sel = [];
     return

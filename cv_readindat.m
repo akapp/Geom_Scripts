@@ -1,5 +1,9 @@
 function [data,varNames] = cv_readindat(varargin)
+
+% [data,varNames] = cv_readindat(options)
+% [data,varNames] = cv_readindat('ptdir')
 % reads in centerline data from patient folder
+% 
 
 % Parse inputs
 if isempty(varargin)
@@ -19,7 +23,27 @@ else
     directory = ptdir;
 end
 
-%% Centerlines Smooth
+% Check directory
+dfs = {'centerlines_sm.dat';
+    'centerlinegeometry.dat';
+    'centerlineattributes.dat';
+    'centerlinesections.dat';
+    'centerlinesections.csv';
+    'centerlinesections.txt';};
+datfiles = strcat(fullfile(directory,dfs));
+allfiles = cv_parsedirectory(directory,'.');
+chkfiles = contains(datfiles,allfiles);
+if any(~chkfiles)
+    filespec = repmat('%s, ',[1,sum(~chkfiles)]);
+    [msg] = sprintf(['Missing Files: ',filespec],dfs{~chkfiles});
+    error(msg(1:end-2))
+end
+clear dfs datfiles allfiles chkfiles fnames
+% if ~exist(,'file')
+% 
+% end
+
+%% Centerlines Smooth: 'centerlines_sm.dat'
 filename = fullfile(directory,'centerlines_sm.dat');
 delimiter = ' ';
 endRow = 1;
@@ -37,7 +61,7 @@ data.clines = [dataArray{1:end-1}];
 fclose(fileID);
 clear dataArray filename delimiter  endRow formatSpec fileID startRow ans
 
-%% Geometry
+%% Geometry: 'centerlinegeometry.dat'
 filename = fullfile(directory,'centerlinegeometry.dat');
 delimiter = ' ';
 endRow = 1;
@@ -74,6 +98,7 @@ fclose(fileID);
 clear dataArray filename delimiter  endRow formatSpec fileID startRow ans
 
 %% Centerlines Sections
+% "centerlinesections.dat" is a vmtk output file
 filename = fullfile(directory,'centerlinesections.dat');
 delimiter = ' ';
 endRow = 1;
@@ -91,6 +116,9 @@ data.sections = [dataArray{1:end-1}];
 fclose(fileID);
 clear dataArray filename delimiter  endRow formatSpec fileID startRow ans
 
+%
+% "centerlinesections.csv" is a "Cell File" from paraview
+% Load "centerlinesections.vtp" and "Save Data" -> "Field Association" -> "Cells"
 if exist(fullfile(directory,'centerlinesections.csv'),'file')
     filename = fullfile(directory,'centerlinesections.csv');
     delimiter = ',';
@@ -109,6 +137,9 @@ else
     warning('Missing centerlinesections.csv from patient directory')
 end
 
+%
+% "centerlinesections.txt" is a "Cell File" from paraview
+% Load "centerlinesections.vtp" and "Save Data" -> "Field Association" -> "Cells"
     filename = fullfile(directory,'centerlinesections.txt');
     delimiter = ' ';
     startRow = 12+size(data.sections,1);

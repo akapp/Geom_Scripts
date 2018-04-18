@@ -2,6 +2,9 @@ function files = cv_parsedirectory(varargin)
 
 % files = cv_parsedirectory(options)
 % files = cv_parsedirectory(options,ext)
+% cv_parsedirectory(pwd,'.dat')
+% cv_parsedirectory(pwd,'.')
+%
 %
 % files = cv_choosefiles(files);
 % default extension '.mat', see cv_defaultprefs
@@ -9,21 +12,31 @@ function files = cv_parsedirectory(varargin)
 
 %% parse inputs
 
-% parse varargin
+% get directory from varargin
 if isempty(varargin)
     directory = pwd;
-    ext = '.mat'; % default extension
-elseif size(varargin,2)==1
-    options = varargin{1};
-    ext = options.prefs.parsedir.ext; % default extension
-elseif size(varargin,2)==2
-    options = varargin{1};
-    ext = varargin{2};
+elseif size(varargin,2)>=1
+    if isstruct(varargin{1})
+        options = varargin{1};
+        directory = options.ptdir;
+    elseif ischar(varargin{1})
+        directory = varargin{1};
+    elseif iscell(varargin{1})
+        keyboard
+    end
 end
 
-% parse options
-if exist('options','var')
-    directory = options.ptdir;
+% get ext from varargin
+if isempty(varargin)
+    ext = '.mat'; % default extension
+elseif size(varargin,2)==1
+    if exist('options','var')
+        ext = options.prefs.parsedir.ext; % default extension
+    else
+        ext = '.mat'; % default extension
+    end
+elseif size(varargin,2)==2
+    ext = varargin{2};
 end
 
 %% Get Files

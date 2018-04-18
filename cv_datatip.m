@@ -36,9 +36,10 @@ if strcmp(qA,'Yes')
     set(0,'CurrentFigure',fighandle)
     qstate(1)=1;   
     try cv_waitforspacebar(handles); end
-    c1 = getCursorInfo(dcm_obj)
+    c1 = getCursorInfo(dcm_obj);
     % if options.prefs.segment.showcheckseglinewin
-    %     [~,spln,~,splr] = cv_processcursor(c1,x,y,z)
+    [~,spln,~,splr] = cv_processcursor(c1,x,y,z);
+    fprintf('Line Selected: %0.f\rReference Point: %0.f\r',spln,splr);
     %     chkFig = cv_plotline(x,y,z,spln,splr);
     %     try cv_waitforspacebar(handles); end
     %     close(chkFig)
@@ -57,7 +58,9 @@ if strcmp(qA,'Yes')
     qstate(2)=1;
     try cv_waitforspacebar(handles);
     catch waitforspacebar(); end
-    c2 = getCursorInfo(dcm_obj)
+    c2 = getCursorInfo(dcm_obj);
+    [~,epln,~,eplr] = cv_processcursor(c1,x,y,z);
+    fprintf('Line Selected: %0.f\rReference Point: %0.f\r',epln,eplr);
 elseif strcmp(qA,'Cancel')
     return
 else

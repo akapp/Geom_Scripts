@@ -6,37 +6,49 @@ if ~isfield(getappdata(handles.guifig),'hilightSegment')
     return    
 end
 
-[options,segment,cleanFig] = cv_plotcleanarea(handles,'Flag','handles');
+[options,segment,cleanFig,A] = cv_plotcleanarea(handles,'Flag','handles');
 
-% Save % Ask to overwrite
-A = cv_savecleansegment(options,segment,cleanFig);
+% Save % Ask to confirm
+if ~strcmp(A,'Cancel')
+    A = cv_savecleansegment(options,segment,cleanFig);
+end
 
 
 
 %% Option to cancel mutliple times
 if strcmp(A,'Cancel')
-    [options,segment,cleanFig] = cv_plotcleanarea(handles,'Flag','handles');
-    A = cv_savecleansegment(options,segment,cleanFig);
+    [options,segment,cleanFig,A] = cv_plotcleanarea(handles,'Flag','handles');
+    if ~strcmp(A,'Cancel')
+        A = cv_savecleansegment(options,segment,cleanFig);
+    end
 end
 
 if strcmp(A,'Cancel')
-    [options,segment,cleanFig] = cv_plotcleanarea(handles,'Flag','handles');     
-    A = cv_savecleansegment(options,segment,cleanFig);
+    [options,segment,cleanFig,A] = cv_plotcleanarea(handles,'Flag','handles');
+    if ~strcmp(A,'Cancel')
+        A = cv_savecleansegment(options,segment,cleanFig);
+    end
 end
 
 if strcmp(A,'Cancel')
-    [options,segment,cleanFig] = cv_plotcleanarea(handles,'Flag','handles');     
-    A = cv_savecleansegment(options,segment,cleanFig);
+    [options,segment,cleanFig,A] = cv_plotcleanarea(handles,'Flag','handles');
+    if ~strcmp(A,'Cancel')
+        A = cv_savecleansegment(options,segment,cleanFig);
+    end
 end
 
 if strcmp(A,'Cancel')
-    [options,segment,cleanFig] = cv_plotcleanarea(handles,'Flag','handles');     
-    A = cv_savecleansegment(options,segment,cleanFig);
+    [options,segment,cleanFig,A] = cv_plotcleanarea(handles,'Flag','handles');
+    if ~strcmp(A,'Cancel')
+        A = cv_savecleansegment(options,segment,cleanFig);
+    end
 end
 
 if strcmp(A,'Cancel')
-    [options,segment,cleanFig] = cv_plotcleanarea(handles,'Flag','handles');     
-    A = cv_savecleansegment(options,segment,cleanFig);
+    [options,segment,cleanFig,A] = cv_plotcleanarea(handles,'Flag','handles');
+    if ~strcmp(A,'Cancel')
+        A = cv_savecleansegment(options,segment,cleanFig);
+    end
 end
 
 if strcmp(A,'Cancel')

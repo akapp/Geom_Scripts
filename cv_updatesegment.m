@@ -1,4 +1,4 @@
-function [segment,isclean,area] = cv_updatesegment(data,segment)
+function [segment,isclean,area,datainfo] = cv_updatesegment(data,segment)
 
 % [segment,isclean] = cv_updatesegment(data,segment)
 % Updates area curvature and torsion
@@ -28,19 +28,34 @@ for i = 1:length(segs)-1
 end
 
 % If cleaned use as index
-line = segment.line;
+l = segment.line;
+idx = segment.refidx(1):segment.refidx(2);
 if isfield(segment,'cleanidx')
     isclean = 1;
     idx = segment.cleanidx;
+    % Legacy
+    if size(segment.cleanidx,1)~=1
+        keyboard
+        idx = segment.refidx(1):segment.refidx(2);
+        idx = idx(segment.cleanidx);
+        segment.cleanidx = idx;
+    else
+        idx = segment.cleanidx;
+    end
 else
     isclean = 0;
-    idx = segment.refidx(1):segment.refidx(2);
 end
 
 if isempty(cell2mat(area))
     error('missing Area data.')
 end
 
-segment.area = area{line}(idx);
-segment.curvature = curvature{line}(idx);
-segment.torsion = torsion{line}(idx);
+segment.area = area{l}(idx);
+segment.curvature = curvature{l}(idx);
+segment.torsion = torsion{l}(idx);
+
+datainfo.segs = segs;
+datainfo.x = x;
+datainfo.y = y;
+datainfo.z = z;
+

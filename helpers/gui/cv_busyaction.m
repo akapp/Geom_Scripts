@@ -1,7 +1,7 @@
 function cv_busyaction(varargin)
 
 % cv_busyaction(handles,'on')
-
+pause(0.1)
 handles = varargin{1};
 onoff=varargin{2};
 try str = varargin{3}; end

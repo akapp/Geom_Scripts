@@ -1,0 +1,98 @@
+# VMTK_Workflow
+# 4/17/2018
+
+##------------------------------------------------------------------------##
+##-------------- 1. Define directory and stl name centerlines ------------##
+##------------------------------------------------------------------------##
+
+cd /Users/arikappel/GoogleDrive/CRC_Lab/Geometry/Geom_Data/019PH019 
+
+stl=PH_53637523_CoWFinal_001.stl
+
+vmtksurfaceviewer -ifile $stl
+
+vmtksurfacesmoothing -ifile $stl -passband 0.1 -iterations 30 -ofile surface.stl
+
+vmtksurfacesmoothing -ifile $stl -passband 0.1 -iterations 30 -ofile surface.vtp --pipe vmtksurfaceviewer -ifile surface.vtp
+
+##------------------------------------------------------------------------##
+##-------------- 2a. Manually define segment centerlines here ------------##
+##------------------------------------------------------------------------##
+
+vmtkcenterlines -ifile surface.vtp -ofile centerlinesegment.vtp
+
+vmtksurfacereader -ifile surface.vtp --pipe vmtkrenderer --pipe vmtksurfaceviewer -opacity 0.25 --pipe vmtksurfaceviewer -ifile centerlinesegment.vtp -array MaximumInscribedSphereRadius
+
+vmtksurfaceappend -ifile centerlinesegment.vtp -i2file centerlinesegment.vtp -ofile centerlinesegment.vtp
+
+
+##------------------------------------------------------------------------##
+##---------- 2b. Manually append segments. See Examples below. -----------##
+##------------------------------------------------------------------------##
+
+
+vmtksurfaceappend -ifile centerlinesegment_LICA.vtp -i2file centerlinesegment_RICA.vtp -ofile centerlinesegment_ICA.vtp
+
+vmtksurfaceappend -ifile centerlinesegment_LVert.vtp -i2file centerlinesegment_RVert.vtp -ofile centerlinesegment_Verts.vtp
+
+vmtksurfaceappend -ifile centerlinesegment_ICA.vtp -i2file centerlinesegment_Verts.vtp -ofile centerlinesegment_ALL.vtp 
+
+
+##------------------------------------------------------------------------##
+##-------------- Run the following on "centerlines.vtp" which ------------##
+##-------------- contains all of the centerlines in one file  ------------##
+##------------------------------------------------------------------------##
+
+vmtkcenterlineresampling -ifile centerlines.vtp -length 0.2 -ofile centerlines_sm.vtp 
+
+vmtkcenterlinesmoothing -ifile centerlines_sm.vtp -iterations 30 -ofile centerlines_sm.vtp 
+
+vmtkcenterlinegeometry -ifile centerlines_sm.vtp -smoothing 1 -iterations 500 -factor 0.5 -outputsmoothed 1 -ofile centerlinegeometry.vtp 
+
+vmtkcenterlinesections -ifile surface.vtp -centerlinesfile centerlines_sm.vtp -ofile centerlinesections.vtp
+
+vmtkcenterlineattributes -ifile centerlines_sm.vtp -ofile centerlineattributes.vtp
+
+
+vmtksurfacewriter -ifile surface.vtp -ofile surface.dat
+vmtksurfacewriter -ifile centerlines_sm.vtp -ofile centerlines_sm.dat
+vmtksurfacewriter -ifile centerlinegeometry.vtp -ofile centerlinegeometry.dat
+vmtksurfacewriter -ifile centerlinesections.vtp -ofile centerlinesections.dat
+vmtksurfacewriter -ifile centerlineattributes.vtp -ofile centerlineattributes.dat
+
+vmtksurfacewriter -f ply -mode ascii -ifile centerlinesections.vtp -ofile centerlinesections.ply
+cp centerlinesections.ply centerlinesections.txt
+
+##------------------------------------------------------------------------##
+##------------------------------ END OF CODE -----------------------------##
+##------------------------------------------------------------------------##
+##
+##---------------- Load "centerlinesections.vtp" in Paraview -------------## 
+## "Save Data"-> "Field Association" -> "Cells"->"centerlinesections.csv" ##
+
+# File List:
+centerlinesections.csv
+centerlineattributes.dat	centerlinesections.dat
+centerlineattributes.vtp	centerlinesections.ply
+centerlinegeometry.dat		centerlinesections.txt
+centerlinegeometry.vtp		centerlinesections.vtp
+centerlines.vtp			surface.dat
+centerlines_sm.dat		surface.stl
+centerlines_sm.vtp		surface.vtp
+
+# File List:
+    {'centerlineattributes.dat'}
+    {'centerlineattributes.vtp'}
+    {'centerlinegeometry.dat'  }
+    {'centerlinegeometry.vtp'  }
+    {'centerlines.vtp'         }
+    {'centerlines_sm.dat'      }
+    {'centerlines_sm.vtp'      }
+    {'centerlinesections.csv'  }
+    {'centerlinesections.dat'  }
+    {'centerlinesections.ply'  }
+    {'centerlinesections.txt'  }
+    {'centerlinesections.vtp'  }
+    {'surface.dat'             }
+    {'surface.stl'             }
+    {'surface.vtp'             }

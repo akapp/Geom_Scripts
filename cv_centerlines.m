@@ -336,13 +336,16 @@ cv_cleansegment(handles)
 
 if strcmp(handles.fileslist.Enable,'off')
     refreshsegmenthandles(handles)
+    refreshsectionshandles(handles)
     refreshfileslist(handles)
     set(handles.fileslist,'Enable','on')
 elseif strcmp(handles.fileslist.Enable,'on') && handles.sectionstoggle.Value
     refreshsectionshandles(handles)
-    set(handles.sectionstoggle,'Value',1)
-    sectionstoggle_Callback(hObject,eventdata,handles)
+    refreshfileslist(handles)
+    %set(handles.sectionstoggle,'Value',0)
+    %sectionstoggle_Callback(hObject,eventdata,handles)
 end
+
 % --- Executes on button press in writeseg2textsingle.
 function writeseg2textsingle_Callback(hObject, eventdata, handles)
 % hObject    handle to writeseg2textsingle (see GCBO)
@@ -416,6 +419,10 @@ if handles.stltoggle.Value
     if isempty(stlHandle)
         cv_busyaction(handles,'on','Loading...')
         pause(0.1)
+        if ~exist([options.ptdir,'/vmtk/surface.stl'],'file')
+            cv_busyaction(handles,'off')
+            error(['Cannot find ' options.ptdir,'/vmtk/surface.stl'])
+        end
         [vertices,faces] = stlRead([options.ptdir,'/vmtk/surface.stl']);
         stlHandle = cv_plotstl(vertices,faces,options.ptname,handles.guifig);
         setappdata(handles.guifig,'stlHandle',stlHandle)

@@ -39,14 +39,13 @@ catch
 end
 
 % And index the indices
-dIdx = setdiff(rIdx,cIdx);
-Rloop=zeros(size(dIdx));
 if isclean
-    Cloop=[];
+    dIdx = setdiff(rIdx,cIdx);
+    Rloop=zeros(size(dIdx));
     for i = 1:length(dIdx)
         Rloop(i) = find(rIdx==dIdx(i));
     end
-    Cloop = setdiff(1:length(rIdx),Rloop);
+    Cloop = setdiff(1:length(rIdx),Rloop);    % Cloop=zeros(size(cIdx));
 else
     Rloop = 1:length(rIdx);
 end

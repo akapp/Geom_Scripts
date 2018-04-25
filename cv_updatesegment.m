@@ -31,7 +31,7 @@ end
 l = segment.line;
 idx = segment.refidx(1):segment.refidx(2);
 if isfield(segment,'cleanidx')
-    isclean = 1;
+    isclean = true;
     idx = segment.cleanidx;
     % Legacy
     if size(segment.cleanidx,1)~=1
@@ -43,7 +43,7 @@ if isfield(segment,'cleanidx')
         idx = segment.cleanidx;
     end
 else
-    isclean = 0;
+    isclean = false;
 end
 
 if isempty(cell2mat(area))
@@ -53,6 +53,10 @@ end
 segment.area = area{l}(idx);
 segment.curvature = curvature{l}(idx);
 segment.torsion = torsion{l}(idx);
+
+if isclean
+    segment.cleanxyz = [x{l}(idx), y{l}(idx), z{l}(idx)];
+end
 
 datainfo.segs = segs;
 datainfo.x = x;

@@ -170,10 +170,11 @@ catch
     options.ptdir = options.uipatdirs{1};
 end
         
-data = cv_readindat(options.ptdir);
+[data,varnames] = cv_readindat(options.ptdir);
 cv_plotcenterlines(options,data,handles.guifig);
 view([0 0])
 
+setappdata(handles.guifig,'varnames',varnames)
 setappdata(handles.guifig,'data',data)
 setappdata(handles.guifig,'options',options)
 try delete(getappdata(handles.guifig,'hilightHandles')); end
